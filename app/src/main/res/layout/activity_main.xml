@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2019. RRatChet.
+  ~ Created by ASLai(laijianhua@rratchet.com).
+  ~
+  ~ 项目名称：rratchet-sdk-rxbus-trunk
+  ~ 模块名称：app
+  ~
+  ~ 文件名称：activity_main.xml
+  ~ 文件描述：
+  ~
+  ~ 创 建 人：ASLai(laijianhua@rratchet.com)
+  ~
+  ~ 上次修改时间：2019-04-02 18:07:55
+  ~
+  ~ 修 改 人：ASLai(laijianhua@rratchet.com)
+  ~ 修改时间：2019-04-02 23:18:47
+  ~ 修改备注：
+  -->
+
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".ui.MainActivity">
+
+    <Button
+        android:id="@+id/simple_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onSimpleAction"
+        android:padding="16dp"
+        android:text="简单使用"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/custom_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:onClick="onCustomAction"
+        android:padding="16dp"
+        android:text="定制订阅器"
+        app:layout_constraintTop_toBottomOf="@id/simple_button" />
+
+    <Button
+        android:id="@+id/event_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:onClick="onEventAction"
+        android:padding="16dp"
+        android:text="定制事件"
+        app:layout_constraintTop_toBottomOf="@id/custom_button" />
+
+    <com.rratchet.sdk.rxbus.demo.widget.ControlView
+        android:id="@+id/control_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/event_button"
+        app:layout_constraintVertical_weight="1" />
+
+
+</android.support.constraint.ConstraintLayout>

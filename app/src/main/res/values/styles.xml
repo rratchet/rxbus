@@ -1,0 +1,30 @@
+<!--
+  ~ Copyright (c) 2019. RRatChet.
+  ~ Created by ASLai(laijianhua@rratchet.com).
+  ~
+  ~ 项目名称：rratchet-sdk-rxbus-trunk
+  ~ 模块名称：app
+  ~
+  ~ 文件名称：styles.xml
+  ~ 文件描述：
+  ~
+  ~ 创 建 人：ASLai(laijianhua@rratchet.com)
+  ~
+  ~ 上次修改时间：2019-04-02 18:04:54
+  ~
+  ~ 修 改 人：ASLai(laijianhua@rratchet.com)
+  ~ 修改时间：2019-04-02 23:18:47
+  ~ 修改备注：
+  -->
+
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+</resources>

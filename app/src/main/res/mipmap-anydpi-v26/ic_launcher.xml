@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2019. RRatChet.
+  ~ Created by ASLai(laijianhua@rratchet.com).
+  ~
+  ~ 项目名称：rratchet-sdk-rxbus-trunk
+  ~ 模块名称：app
+  ~
+  ~ 文件名称：ic_launcher.xml
+  ~ 文件描述：
+  ~
+  ~ 创 建 人：ASLai(laijianhua@rratchet.com)
+  ~
+  ~ 上次修改时间：2019-04-02 18:07:55
+  ~
+  ~ 修 改 人：ASLai(laijianhua@rratchet.com)
+  ~ 修改时间：2019-04-02 23:18:47
+  ~ 修改备注：
+  -->
+
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+</adaptive-icon>
