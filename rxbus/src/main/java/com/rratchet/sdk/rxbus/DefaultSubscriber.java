@@ -5,7 +5,7 @@
  * 项目名称：rratchet-sdk-rxbus-trunk
  * 模块名称：library
  *
- * 文件名称：EventSubscriber.java
+ * 文件名称：DefaultSubscriber.java
  * 文件描述：
  *
  * 创 建 人：ASLai(laijianhua@rratchet.com)
@@ -20,9 +20,9 @@
 package com.rratchet.sdk.rxbus;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
 import io.reactivex.internal.functions.ObjectHelper;
@@ -33,15 +33,14 @@ import io.reactivex.internal.functions.ObjectHelper;
  * 作 者：      ASLai(gdcpljh@126.com).
  * 日 期：      18-8-6
  * 版 本：      V1.0
- * 描 述：      description
+ * 描 述：      默认的订阅者
  *
  * </pre>
  *
  * @param <T> the type parameter
- *
  * @author ASLai
  */
-public class EventSubscriber<T> extends AbstractSubscriber<T> {
+public class DefaultSubscriber<T> extends AbstractSubscriber<T> {
 
     /**
      * The Hash code.
@@ -51,11 +50,11 @@ public class EventSubscriber<T> extends AbstractSubscriber<T> {
     /**
      * The RxEvent class.
      */
-    private Class<T> eventClass;
+    private Class<T>     eventClass;
     /**
      * The Receiver.
      */
-    private Consumer<T> receiver;
+    private Consumer<T>  receiver;
     /**
      * The Filter.
      */
@@ -63,7 +62,7 @@ public class EventSubscriber<T> extends AbstractSubscriber<T> {
     /**
      * The Scheduler.
      */
-    private Scheduler scheduler;
+    private Scheduler    scheduler;
 
     /**
      * Instantiates a new Custom subscriber.
@@ -71,7 +70,7 @@ public class EventSubscriber<T> extends AbstractSubscriber<T> {
      * @param eventClass the event class
      * @param receiver   the receiver
      */
-    EventSubscriber(@NonNull Class<T> eventClass, @NonNull Consumer<T> receiver) {
+    DefaultSubscriber(@NonNull Class<T> eventClass, @NonNull Consumer<T> receiver) {
         this.eventClass = eventClass;
         this.receiver = receiver;
 
@@ -84,28 +83,26 @@ public class EventSubscriber<T> extends AbstractSubscriber<T> {
      * @param <T>        the type parameter
      * @param eventClass the event class
      * @param receiver   the receiver
-     *
      * @return the event subscriber
      */
-    public static <T> EventSubscriber<T> create(@NonNull Class<T> eventClass, @NonNull Consumer<T> receiver) {
+    public static <T> DefaultSubscriber<T> create(@NonNull Class<T> eventClass, @NonNull Consumer<T> receiver) {
 
         ObjectHelper.requireNonNull(eventClass, "RxEvent class must not be null.");
         if (eventClass.isInterface()) {
             throw new IllegalArgumentException("RxEvent class must be on a concrete class type.");
         }
         ObjectHelper.requireNonNull(receiver, "Receiver must not be null.");
-        return new EventSubscriber<>(eventClass, receiver);
+        return new DefaultSubscriber<>(eventClass, receiver);
     }
 
     /**
      * With filter custom subscriber.
      *
      * @param filter the filter
-     *
      * @return the custom subscriber
      */
     @SuppressWarnings("WeakerAccess")
-    public EventSubscriber<T> withFilter(@NonNull Predicate<T> filter) {
+    public DefaultSubscriber<T> withFilter(@NonNull Predicate<T> filter) {
         ObjectHelper.requireNonNull(filter, "Filter must not be null.");
         this.filter = filter;
         return this;
@@ -115,11 +112,10 @@ public class EventSubscriber<T> extends AbstractSubscriber<T> {
      * With scheduler custom subscriber.
      *
      * @param scheduler the scheduler
-     *
      * @return the custom subscriber
      */
     @SuppressWarnings("WeakerAccess")
-    public EventSubscriber<T> withScheduler(@NonNull Scheduler scheduler) {
+    public DefaultSubscriber<T> withScheduler(@NonNull Scheduler scheduler) {
         ObjectHelper.requireNonNull(scheduler, "Scheduler must not be null.");
         this.scheduler = scheduler;
         return this;
@@ -140,9 +136,14 @@ public class EventSubscriber<T> extends AbstractSubscriber<T> {
      *
      * @return the filter
      */
-    @Nullable
+    @NonNull
     Predicate<T> getFilter() {
-        return filter;
+        return filter == null ? new Predicate<T>() {
+            @Override
+            public boolean test(T t) throws Exception {
+                return true;
+            }
+        } : filter;
     }
 
     /**
@@ -150,9 +151,9 @@ public class EventSubscriber<T> extends AbstractSubscriber<T> {
      *
      * @return the scheduler
      */
-    @Nullable
+    @NonNull
     Scheduler getScheduler() {
-        return scheduler;
+        return scheduler == null ? AndroidSchedulers.mainThread() : scheduler;
     }
 
     @Override
@@ -177,7 +178,7 @@ public class EventSubscriber<T> extends AbstractSubscriber<T> {
             return false;
         }
 
-        EventSubscriber<?> that = (EventSubscriber<?>) other;
+        DefaultSubscriber<?> that = (DefaultSubscriber<?>) other;
 
         return receiver.equals(that.receiver);
     }

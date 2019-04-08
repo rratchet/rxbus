@@ -39,4 +39,26 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Subscribe {
+
+    /**
+     * 事件的标签，默认为 {@link DefaultEvent#TAG}
+     *
+     * @return
+     */
+    String tag() default DefaultEvent.TAG;
+
+    /**
+     * 事件的类型，默认为 {@link DefaultEvent#TYPE}
+     *
+     * @return
+     */
+    String type() default DefaultEvent.TYPE;
+
+    /**
+     * 线程调度类型，默认为当前线程
+     *
+     * @return
+     */
+    SchedulerType schedulerType() default SchedulerType.CURRENT_THREAD;
+
 }

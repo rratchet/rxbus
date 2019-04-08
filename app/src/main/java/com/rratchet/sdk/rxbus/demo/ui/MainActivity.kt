@@ -60,7 +60,15 @@ class MainActivity : AppCompatActivity() {
 
     @Subscribe
     fun onEvent(obj: Object) {
-        control_view.print(obj.toString())
+        control_view.print("onEvent#" + obj.toString())
+    }
+
+    @Subscribe(
+            tag = "DEFAULT",
+            type = "testSubscribeMethod"
+    )
+    fun onDefaultEvent(obj: Object) {
+        control_view.print("onDefaultEvent#" + obj.toString())
     }
 
     fun onSimpleAction(view: View) {

@@ -49,14 +49,9 @@ import io.reactivex.subjects.Subject;
 public final class RxBus implements Bus {
 
     /**
-     * 默认的 {@link BusBridge}
-     */
-    private final BusBridge<Class<?>> DEFAULT = new BusBridge();
-
-    /**
      * 观察者所订阅事件的 {@link BusBridge}
      */
-    private final ConcurrentMap<Class<?>, BusBridge<String>> EVENT_BRIDGE = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Class<?>, BusBridge<String>> DEFAULT = new ConcurrentHashMap();
 
     /**
      * The Bus.
@@ -71,28 +66,40 @@ public final class RxBus implements Bus {
 
     @Override
     public void register(@NonNull Object observer) {
-        delegate.register(DEFAULT, observer);
+
+        ObjectHelper.requireNonNull(observer, "Observer to register must not be null.");
+
+        Class<?> observerClass = observer.getClass();
+
+        DEFAULT.putIfAbsent(observerClass, new BusBridge<String>());
+        BusBridge<String> bridge = DEFAULT.get(observerClass);
+
+        delegate.register(bridge, observer);
     }
 
     @Override
-    public <T> EventSubscriber<T> obtainSubscriber(@NonNull Class<T> eventClass, @NonNull Consumer<T> receiver) {
-        return EventSubscriber.create(eventClass, receiver);
+    public <T> void register(@NonNull Object observer, DefaultSubscriber<T> subscriber) {
+
+        ObjectHelper.requireNonNull(observer, "Observer to register must not be null.");
+        ObjectHelper.requireNonNull(subscriber, "Subscriber to register must not be null.");
+
+        Class<?> observerClass = observer.getClass();
+
+        DEFAULT.putIfAbsent(observerClass, new BusBridge<String>());
+        BusBridge<String> bridge = DEFAULT.get(observerClass);
+
+        delegate.register(bridge, subscriber);
     }
 
     @Override
-    public <T> void registerSubscriber(@NonNull Object observer, @NonNull EventSubscriber<T> subscriber) {
-        delegate.register(DEFAULT, observer, subscriber);
-    }
-
-    @Override
-    public <T, Event extends RxEvent<T>> void registerEvent(@NonNull Object observer, @NonNull Event subjectEvent, final @NonNull Consumer<T> receiver) {
+    public <T, Event extends RxEvent<T>> void register(@NonNull Object observer, @NonNull Event subjectEvent, final @NonNull Consumer<T> receiver) {
 
         ObjectHelper.requireNonNull(observer, "Observer to register must not be null.");
         ObjectHelper.requireNonNull(subjectEvent, "Event to register must not be null.");
         ObjectHelper.requireNonNull(receiver, "Receiver to register must not be null.");
 
         Class<Event> eventClass = (Class<Event>) subjectEvent.getClass();
-        registerEvent(observer, subjectEvent, EventSubscriber.create(eventClass, new Consumer<Event>() {
+        register(observer, subjectEvent, DefaultSubscriber.create(eventClass, new Consumer<Event>() {
                     @Override
                     public void accept(Event event) throws Exception {
                         receiver.accept(event.getData());
@@ -102,7 +109,7 @@ public final class RxBus implements Bus {
     }
 
     @Override
-    public <Event extends RxEvent> void registerEvent(@NonNull Object observer, @NonNull Event subjectEvent, @NonNull EventSubscriber<Event> subscriber) {
+    public <Event extends RxEvent> void register(@NonNull Object observer, @NonNull Event subjectEvent, @NonNull DefaultSubscriber<Event> subscriber) {
 
         ObjectHelper.requireNonNull(observer, "Observer to register must not be null.");
         ObjectHelper.requireNonNull(subjectEvent, "Event to register must not be null.");
@@ -111,18 +118,10 @@ public final class RxBus implements Bus {
         Class<?> observerClass = observer.getClass();
         String eventString = subjectEvent.toEventString();
 
-        EVENT_BRIDGE.putIfAbsent(observerClass, new BusBridge<String>());
-        BusBridge<String> bridge = EVENT_BRIDGE.get(observerClass);
+        DEFAULT.putIfAbsent(observerClass, new BusBridge<String>());
+        BusBridge<String> bridge = DEFAULT.get(observerClass);
 
         delegate.register(bridge, subjectEvent, subscriber);
-    }
-
-    @Override
-    public void unregister(@NonNull Object observer) {
-        // 注销时需要同时注销自定义事件的观察者
-        unregisterEvent(observer);
-
-        delegate.unregister(DEFAULT, observer);
     }
 
     @Override
@@ -133,8 +132,8 @@ public final class RxBus implements Bus {
 
         Class<?> observerClass = observer.getClass();
 
-        EVENT_BRIDGE.putIfAbsent(observerClass, new BusBridge<String>());
-        BusBridge<String> bridge = EVENT_BRIDGE.get(observerClass);
+        DEFAULT.putIfAbsent(observerClass, new BusBridge<String>());
+        BusBridge<String> bridge = DEFAULT.get(observerClass);
 
         delegate.unregister(bridge, subjectEvent);
     }
@@ -146,8 +145,8 @@ public final class RxBus implements Bus {
 
         Class<?> observerClass = observer.getClass();
 
-        EVENT_BRIDGE.putIfAbsent(observerClass, new BusBridge<String>());
-        BusBridge<String> bridge = EVENT_BRIDGE.get(observerClass);
+        DEFAULT.putIfAbsent(observerClass, new BusBridge<String>());
+        BusBridge<String> bridge = DEFAULT.get(observerClass);
 
         // 拿出当前观察者所有注册的事件的响应
         ConcurrentMap<String, CompositeDisposable> compositeMap = bridge.OBSERVERS;
@@ -169,10 +168,10 @@ public final class RxBus implements Bus {
         compositeMap.clear();
 
         // 遍历所有的订阅者并移除
-        ConcurrentMap<String, CopyOnWriteArraySet<EventSubscriber<?>>> subscriberMap = bridge.SUBSCRIBERS;
+        ConcurrentMap<String, CopyOnWriteArraySet<DefaultSubscriber<?>>> subscriberMap = bridge.SUBSCRIBERS;
         if (!subscriberMap.isEmpty()) {
-            for (Map.Entry<String, CopyOnWriteArraySet<EventSubscriber<?>>> entry : subscriberMap.entrySet()) {
-                Set<EventSubscriber<?>> subscribers = entry.getValue();
+            for (Map.Entry<String, CopyOnWriteArraySet<DefaultSubscriber<?>>> entry : subscriberMap.entrySet()) {
+                Set<DefaultSubscriber<?>> subscribers = entry.getValue();
                 if (subscribers != null) {
                     subscribers.clear();
                 }
@@ -182,8 +181,46 @@ public final class RxBus implements Bus {
     }
 
     @Override
-    public void post(@NonNull Object event) {
-        ObjectHelper.requireNonNull(event, "Event must not be null.");
-        bus.onNext(event);
+    public void unregister(@NonNull Object observer) {
+
+        // 注销时需要同时注销自定义事件的观察者
+        unregisterEvent(observer);
+
+        Class<?> observerClass = observer.getClass();
+
+        DEFAULT.putIfAbsent(observerClass, new BusBridge<String>());
+        BusBridge<String> bridge = DEFAULT.get(observerClass);
+
+        delegate.unregister(bridge, observer);
+    }
+
+    @Override
+    public void post(@NonNull Object data) {
+
+        ObjectHelper.requireNonNull(data, "Post data must not be null.");
+        if (data instanceof RxEvent) {
+            bus.onNext(data);
+        } else {
+            EventEmitter.create()
+                    .withData(data)
+                    .post();
+        }
+    }
+
+    @Override
+    public void post(String type, Object data) {
+        EventEmitter.create()
+                .withType(type)
+                .withData(data)
+                .post();
+    }
+
+    @Override
+    public void post(String tag, String type, Object data) {
+        EventEmitter.create()
+                .withTag(tag)
+                .withType(type)
+                .withData(data)
+                .post();
     }
 }

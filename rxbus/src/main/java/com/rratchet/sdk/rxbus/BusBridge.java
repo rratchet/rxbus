@@ -43,11 +43,11 @@ class BusBridge<T> {
     /**
      * The Observers.
      */
-    public final ConcurrentMap<T, CompositeDisposable> OBSERVERS
+    public final ConcurrentMap<T, CompositeDisposable>                       OBSERVERS
             = new ConcurrentHashMap<>();
     /**
      * The Subscribers.
      */
-    public final ConcurrentMap<T, CopyOnWriteArraySet<EventSubscriber<?>>> SUBSCRIBERS
+    public final ConcurrentMap<T, CopyOnWriteArraySet<DefaultSubscriber<?>>> SUBSCRIBERS
             = new ConcurrentHashMap<>();
 }

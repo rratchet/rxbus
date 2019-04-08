@@ -56,6 +56,8 @@ class SimpleActivity : AppCompatActivity() {
         eventInfo.time++
 
         BusProvider.getInstance().post(eventInfo)
+
+        BusProvider.getInstance().post("testSubscribeMethod", "Hi, " + eventInfo.toString())
     }
 
     fun onClearAction(view: View) {

@@ -42,6 +42,9 @@ import io.reactivex.functions.Consumer;
  */
 public interface Bus {
 
+    /**
+     * The constant TAG.
+     */
     String TAG = Bus.class.getSimpleName();
 
     /**
@@ -52,45 +55,33 @@ public interface Bus {
     void register(@NonNull Object observer);
 
     /**
-     * 获取自定义的订阅器.
+     * 注册观察者并订阅相应的事件.
      *
-     * @param <T>        the type parameter
-     * @param eventClass the event class
-     * @param receiver   the receiver
-     *
-     * @return the custom subscriber
+     * @param observer   观察者对象
+     * @param subscriber 订阅者对象
+     * @param <T>
      */
-    <T> EventSubscriber<T> obtainSubscriber(@NonNull Class<T> eventClass, @NonNull Consumer<T> receiver);
+    <T> void register(@NonNull Object observer, DefaultSubscriber<T> subscriber);
 
     /**
-     * 注册观察者.
+     * 注册观察者并订阅当前事件
      *
-     * @param <T>        the type parameter
-     * @param observer   the observer
-     * @param subscriber the subscriber
+     * @param observer
+     * @param subjectEvent
+     * @param receiver
+     * @param <Event>
      */
-    <T> void registerSubscriber(@NonNull Object observer, @NonNull EventSubscriber<T> subscriber);
+    <T, Event extends RxEvent<T>> void register(@NonNull Object observer, @NonNull Event subjectEvent, @NonNull Consumer<T> receiver);
 
     /**
-     * 注册观察者并订阅当前事件.
+     * 注册观察者并订阅当前事件
      *
-     * @param <Event>      the type parameter
-     * @param observer     the observer
-     * @param subjectEvent the subject event
-     * @param subscriber   the subscriber
+     * @param observer
+     * @param subjectEvent
+     * @param subscriber
+     * @param <Event>
      */
-    <Event extends RxEvent> void registerEvent(@NonNull Object observer, @NonNull Event subjectEvent, @NonNull EventSubscriber<Event> subscriber);
-
-    /**
-     * 注册观察者并订阅当前事件.
-     *
-     * @param <T>          the type parameter
-     * @param <Event>      the type parameter
-     * @param observer     the observer
-     * @param subjectEvent the subject event
-     * @param receiver     the receiver
-     */
-    <T, Event extends RxEvent<T>> void registerEvent(@NonNull Object observer, @NonNull Event subjectEvent, @NonNull Consumer<T> receiver);
+    <Event extends RxEvent> void register(@NonNull Object observer, @NonNull Event subjectEvent, @NonNull DefaultSubscriber<Event> subscriber);
 
     /**
      * 注销观察者.
@@ -121,4 +112,23 @@ public interface Bus {
      * @param event the event
      */
     void post(@NonNull Object event);
+
+    /**
+     * 发布.
+     *
+     * @param type the type
+     * @param data the data
+     */
+    void post(String type, Object data);
+
+    /**
+     * 发布.
+     *
+     * @param tag  the tag
+     * @param type the type
+     * @param data the data
+     */
+    void post(String tag, String type, Object data);
+
+
 }

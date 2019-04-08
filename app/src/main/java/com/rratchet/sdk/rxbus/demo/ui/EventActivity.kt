@@ -23,11 +23,13 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.rratchet.sdk.rxbus.BusProvider
-import com.rratchet.sdk.rxbus.EventSubscriber
+import com.rratchet.sdk.rxbus.DefaultSubscriber
+import com.rratchet.sdk.rxbus.Subscribe
 import com.rratchet.sdk.rxbus.demo.event.DefaultEvent
 import com.rratchet.sdk.rxbus.demo.event.EventInfo
 import com.rratchet.sdk.rxbus.demo.widget.ControlView
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_simple.*
 
 
 class EventActivity : AppCompatActivity() {
@@ -46,7 +48,7 @@ class EventActivity : AppCompatActivity() {
 
         eventInfo.name = "event"
 
-        val subscriber = EventSubscriber.create(DefaultEvent::class.java) {
+        val subscriber = DefaultSubscriber.create(DefaultEvent::class.java) {
             // TODO: Do something
             controlView?.print(it.toString())
         }.withFilter {
@@ -56,8 +58,17 @@ class EventActivity : AppCompatActivity() {
 
 
         // 注册
-        BusProvider.getInstance().registerEvent(this, defaultEvent, subscriber)
+        BusProvider.getInstance().register(this, defaultEvent, subscriber)
+        BusProvider.getInstance().register(this)
 
+    }
+
+    @Subscribe(
+            tag = "DEFAULT",
+            type = "testSubscribeMethod"
+    )
+    fun onDefaultEvent(obj: Object) {
+        control_view.print("onDefaultEvent#" + obj.toString())
     }
 
     override fun onDestroy() {

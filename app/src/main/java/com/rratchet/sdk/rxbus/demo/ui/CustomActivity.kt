@@ -23,7 +23,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import com.rratchet.sdk.rxbus.BusProvider
-import com.rratchet.sdk.rxbus.EventSubscriber
+import com.rratchet.sdk.rxbus.DefaultSubscriber
 import com.rratchet.sdk.rxbus.demo.R
 import com.rratchet.sdk.rxbus.demo.event.EventInfo
 import com.rratchet.sdk.rxbus.demo.widget.ControlView
@@ -41,10 +41,10 @@ class CustomActivity : AppCompatActivity() {
         controlView = findViewById(R.id.control_view)
         eventInfo.name = "custom"
 
-        var subscriber = EventSubscriber.create(EventInfo::class.java) {
+        var subscriber = DefaultSubscriber.create(EventInfo::class.java) {
             controlView?.print(it?.toString())
         }
-        BusProvider.getInstance().registerSubscriber(this, subscriber)
+        BusProvider.getInstance().register(this, subscriber)
     }
 
     override fun onDestroy() {
