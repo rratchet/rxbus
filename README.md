@@ -6,7 +6,7 @@
 
 推荐获取一个RxBus的单例：
 
-```java
+```
 Bus bus = BusProvider.getInstance();
 ```
 

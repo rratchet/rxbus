@@ -57,7 +57,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.rratchet.sdk.rxbus.demo.widget.ControlView
+    <com.rratchet.support.rxbus.demo.widget.ControlView
         android:id="@+id/control_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
